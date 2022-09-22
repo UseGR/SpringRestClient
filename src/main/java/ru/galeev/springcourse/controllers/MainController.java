@@ -1,33 +1,45 @@
 package ru.galeev.springcourse.controllers;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.galeev.springcourse.Communication;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
 import ru.galeev.springcourse.models.Person;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class MainController {
-    private final Communication communication;
+    private final WebClient webClient;
 
-    public MainController(Communication communication) {
-        this.communication = communication;
+    public MainController() {
+        this.webClient = WebClient.create("http://localhost:8080/api/auth");
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<List<Person>> getPeople() {
-        List<Person> people = communication.getAllPeople();
-        return new ResponseEntity<>(people, HttpStatus.OK);
+    @GetMapping
+    public List<Person> getPeople() {
+        Mono<List<Person>> response = webClient
+                .get()
+                .uri("/users")
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+
+        return response.block();
     }
 
-    @GetMapping("/users/{id}")
-    public ResponseEntity<Person> getPersonById(@PathVariable("id") long id) {
-        return new ResponseEntity<>(communication.getPersonById(id), HttpStatus.OK);
+
+    @GetMapping("/{id}")
+    public Mono<Person> getPersonById(@PathVariable(value = "id") Long id) {
+        return webClient
+                .get()
+                .uri("users/{id}", id)
+                .retrieve()
+                .bodyToMono(Person.class);
     }
 }

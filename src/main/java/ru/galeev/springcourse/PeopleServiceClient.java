@@ -11,12 +11,12 @@ import ru.galeev.springcourse.models.Person;
 import java.util.List;
 
 @Component
-public class Communication {
+public class PeopleServiceClient {
     private final RestTemplate restTemplate;
     private final String URL = "http://localhost:8080/api/auth";
 
     @Autowired
-    public Communication(RestTemplate restTemplate) {
+    public PeopleServiceClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
