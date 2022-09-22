@@ -38,7 +38,7 @@ public class MainController {
     public Mono<Person> getPersonById(@PathVariable(value = "id") Long id) {
         return webClient
                 .get()
-                .uri("users/{id}", id)
+                .uri("/users/{id}", id)
                 .retrieve()
                 .bodyToMono(Person.class);
     }
